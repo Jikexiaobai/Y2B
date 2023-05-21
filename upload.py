@@ -145,8 +145,8 @@ def download_cover(url, out):
 # 使用biliup工具上传指定视频文件到B站。
 def upload_video(video_file, cover_file, _config, detail):
     title = detail['title']
-    if len(title) > 80:
-        title = title[:80]
+    if len(title) > 75:
+        title = title[:75]
     yml = {
         "line": "kodo",
         "limit": 3,
