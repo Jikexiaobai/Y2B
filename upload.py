@@ -158,7 +158,7 @@ def upload_video(video_file, cover_file, _config, detail):
                 "cover": cover_file,  # 视频封面
                 "title": "【搬运】" + title,
                 "desc_format_id": 0,
-                "desc": "由董岩松博客(dongyansong.com)自动搬运\n关于Launchpad搬运系列：使用董岩松博客编写的《油管转哔哩哔哩》开源项目自动运行。该项目经过近2个月长期运行，确保并不会对B站造成任何无用的垃圾数据，请B站与各用户知悉。\n原视频：" + detail["origin"],
+                "desc": "由董岩松博客(dongyansong.com)自动搬运\nLaunchpad交流群：780893886 （禁止任何阴阳怪气、怼人等任何带有负能量的蠕虫网友入群）\n工程可以访问原视频看简介有没有(或加群问一下有没有)\nLaunchpad论坛：https://9b7.cn\n关于Launchpad搬运系列：使用董岩松博客编写的《油管转哔哩哔哩》开源项目自动运行。\n该项目经过近2个月长期运行，确保并不会对B站造成任何无用的垃圾数据，请B站与各用户知悉。\n原视频：" + detail["origin"],
                 "dolby": 0,  # 杜比音效
                 "dynamic": "",
                 "subtitle": {
