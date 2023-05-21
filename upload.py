@@ -156,9 +156,9 @@ def upload_video(video_file, cover_file, _config, detail):
                 "source": detail['origin'],
                 "tid": _config['tid'],  # 投稿分区
                 "cover": cover_file,  # 视频封面
-                "title": "【搬运】" + title,
+                "title": "【搬运】" + title, # 稿件标题
                 "desc_format_id": 0,
-                "desc": "由董岩松博客(dongyansong.com)自动搬运\nLaunchpad交流群：780893886 （禁止任何阴阳怪气、怼人等任何带有负能量的蠕虫网友入群）\n工程可以访问原视频看简介有没有(或加群问一下有没有)\nLaunchpad论坛：https://9b7.cn\n关于Launchpad搬运系列：使用董岩松博客编写的《油管转哔哩哔哩》开源项目自动运行。\n该项目经过近2个月长期运行，确保并不会对B站造成任何无用的垃圾数据，请B站与各用户知悉。\n原视频：" + detail["origin"],
+                "desc": "由董岩松博客(dongyansong.com)自动搬运\nLaunchpad交流群：780893886 （禁止任何阴阳怪气、怼人等任何带有负能量的蠕虫网友入群）\n工程可以访问原视频看简介有没有(或加群问一下有没有)\nLaunchpad论坛：https://9b7.cn\n关于Launchpad搬运系列：使用董岩松博客编写的《YTB_to_bili》开源项目自动运行。\n该项目经过半年长期运行，确保并不会对B站造成任何无用的垃圾数据，请B站与各用户知悉。\n原视频：" + detail["origin"],
                 "dolby": 0,  # 杜比音效
                 "dynamic": "",
                 "subtitle": {
@@ -195,7 +195,7 @@ def upload_video(video_file, cover_file, _config, detail):
     pushplus_data = {
         "token": "74dadec01cd345e5bb01204bef88fb97",
         "title": "搬运成功《" + detail['title'] + "》",
-        "content": "原视频地址" + detail["origin"]
+        "content": "稿件《" + detail['title'] + "》" + "\n原视频地址 " + detail["origin"]
     }
     res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
     return json.loads(data)
@@ -241,7 +241,7 @@ def upload_process(gist_id, token):
         uploaded[i["detail"]["vid"]] = i
         update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
         logging.info(
-            f'上传完成,vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},bvid:{ret["data"]["bvid"]}')
+            f'上传完成,稿件vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},Bvid:{ret["data"]["bvid"]}')
         logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
         time.sleep(UPLOAD_SLEEP_SECOND)
     os.system("biliup renew 2>&1 > /dev/null")
