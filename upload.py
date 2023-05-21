@@ -20,7 +20,7 @@ PROXY = {
     "https": os.environ.get("https_proxy", None)
 }
 
-
+# 通过Gist ID获取已上传数据（已上传视频信息、配置信息和cookie信息）。
 def get_gist(_gid, token):
     """通过 gist id 获取已上传数据"""
     rsp = requests.get(
@@ -47,7 +47,7 @@ def get_gist(_gid, token):
         logging.error(f"gist 格式错误，重新初始化:{e}")
     return c, t, {}
 
-
+# 将数据写入到指定的文件中，并更新Gist。
 def update_gist(_gid, token, file, data):
     rsp = requests.post(
         "https://api.github.com/gists/" + _gid,
@@ -70,12 +70,12 @@ def update_gist(_gid, token, file, data):
     if rsp.status_code == 422:
         raise Exception("github TOKEN 错误")
 
-
+# 获取指定文件的大小。
 def get_file_size(filename):
     sz = os.path.getsize(filename)
     return int(sz/1024/1024)
 
-
+# 获取指定YouTube频道的视频列表。
 def get_video_list(channel_id: str):
     res = requests.get(
         "https://www.youtube.com/feeds/videos.xml?channel_id=" + channel_id).text
@@ -91,7 +91,7 @@ def get_video_list(channel_id: str):
         })
     return ret
 
-
+# 从视频列表中筛选出未上传过的视频。
 def select_not_uploaded(video_list: list, _uploaded: dict):
     ret = []
     for i in video_list:
@@ -102,7 +102,7 @@ def select_not_uploaded(video_list: list, _uploaded: dict):
         ret.append(i)
     return ret
 
-
+# 获取所有需要上传的视频信息。
 def get_all_video(_config):
     ret = []
     for i in _config:
@@ -114,7 +114,7 @@ def get_all_video(_config):
             })
     return ret
 
-
+# 下载指定URL的视频，并以指定格式保存。
 def download_video(url, out, format):
     try:
         msg = subprocess.check_output(
@@ -136,13 +136,13 @@ def download_video(url, out, format):
         logging.error("未知错误:" + out)
         raise e
 
-
+# 下载指定URL的封面图片，并保存到指定路径。
 def download_cover(url, out):
     res = requests.get(url, verify=VERIFY).content
     with open(out, "wb") as tmp:
         tmp.write(res)
 
-
+# 使用biliup工具上传指定视频文件到B站。
 def upload_video(video_file, cover_file, _config, detail):
     title = detail['title']
     if len(title) > 80:
@@ -194,7 +194,7 @@ def upload_video(video_file, cover_file, _config, detail):
     logging.debug(f'上传完成，返回：{data}')
     return json.loads(data)
 
-
+# 针对单个视频进行上传处理。
 def process_one(detail, config):
     logging.info(f'开始：{detail["vid"]}')
     format = ["webm", "flv", "mp4"]
@@ -214,8 +214,14 @@ def process_one(detail, config):
     os.remove(detail["vid"] + ".jpg")
     return ret
 
-
-def upload_process(gist_id, token):
+# 执行整个上传流程。
+def upload_process(gist_id, token,detail):
+    """
+    该函数用于将 YouTube 频道中未上传的视频搬运到B站。
+    :param gist_id: str, Gist ID.
+    :param token: str, GitHub Token.
+    :return: None
+    """
     config, cookie, uploaded = get_gist(gist_id, token)
     with open("cookies.json", "w", encoding="utf8") as tmp:
         tmp.write(json.dumps(cookie))
