@@ -147,7 +147,7 @@ def filter_string(text):
     """
     过滤字符串中除了中文、英文、数字，日文常用符号以外的字符。
     """
-    pattern = r'[^\w\s\u4e00-\u9fa5\uff01-\uff5e]+'
+    pattern = r'[^\w\s\u4e00-\u9fa5\uac00-\ud7af&]+|[ㅣ]+'
     return re.sub(pattern, '', text)
 
 # 使用biliup工具上传指定视频文件到B站。
