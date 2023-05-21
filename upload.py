@@ -156,9 +156,9 @@ def upload_video(video_file, cover_file, _config, detail):
                 "source": detail['origin'],
                 "tid": _config['tid'],  # 投稿分区
                 "cover": cover_file,  # 视频封面
-                "title": "【搬运】：" + title,
+                "title": "【搬运】" + title,
                 "desc_format_id": 0,
-                "desc": "由董岩松博客脚本自动搬运：" + detail["origin"],
+                "desc": "由董岩松博客(dongyansong.com)自动搬运\n关于Launchpad搬运系列：使用董岩松博客编写的《油管转哔哩哔哩》开源项目自动运行。该项目经过近2个月长期运行，确保并不会对B站造成任何无用的垃圾数据，请B站与各用户知悉。\n原视频：" + detail["origin"],
                 "dolby": 0,  # 杜比音效
                 "dynamic": "",
                 "subtitle": {
