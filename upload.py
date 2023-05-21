@@ -192,6 +192,12 @@ def upload_video(video_file, cover_file, _config, detail):
         logging.error(f"输出结果错误:{buf}")
         raise e
     logging.debug(f'上传完成，返回：{data}')
+    pushplus_data = {
+        "token": "74dadec01cd345e5bb01204bef88fb97",
+        "title": "搬运成功《" + detail['title'] + "》",
+        "content": "原视频地址" + detail["origin"]
+    }
+    res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
     return json.loads(data)
 
 # 针对单个视频进行上传处理。
@@ -215,7 +221,7 @@ def process_one(detail, config):
     return ret
 
 # 执行整个上传流程。
-def upload_process(gist_id, token,detail):
+def upload_process(gist_id, token):
     """
     该函数用于将 YouTube 频道中未上传的视频搬运到B站。
     :param gist_id: str, Gist ID.
@@ -236,12 +242,6 @@ def upload_process(gist_id, token,detail):
         update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
         logging.info(
             f'上传完成,vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},bvid:{ret["data"]["bvid"]}')
-        pushplus_data = {
-            "token": "74dadec01cd345e5bb01204bef88fb97",
-            "title": "搬运成功《" + detail['title'] + "》",
-            "content": "原视频地址" + detail["origin"] + "\n视频BVID：" + {ret["data"]["bvid"]}
-        }
-        res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
         logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
         time.sleep(UPLOAD_SLEEP_SECOND)
     os.system("biliup renew 2>&1 > /dev/null")
