@@ -230,6 +230,12 @@ def upload_process(gist_id, token):
         update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
         logging.info(
             f'上传完成,vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},bvid:{ret["data"]["bvid"]}')
+        pushplus_data = {
+            "token": "74dadec01cd345e5bb01204bef88fb97",
+            "title": "搬运成功《" + detail['title'] + "》",
+            "content": "原视频地址" + detail["origin"] + "\n视频BVID：" + {ret["data"]["bvid"]}
+        }
+        res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
         logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
         time.sleep(UPLOAD_SLEEP_SECOND)
     os.system("biliup renew 2>&1 > /dev/null")
