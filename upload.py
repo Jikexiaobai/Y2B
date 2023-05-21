@@ -190,6 +190,12 @@ def upload_video(video_file, cover_file, _config, detail):
     p.wait()
     if p.returncode != 0:
         raise Exception(p.stdout.read())
+        pushplus_data = {
+        "token": "74dadec01cd345e5bb01204bef88fb97",
+        "title": "搬运失败《" + detail['title'] + "》",
+        "content": "稿件《" + detail['title'] + "》" + "\n报错信息： " + raise Exception(p.stdout.read()) + "\n具体报错为:p.stdout.read()"
+        }
+        res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
     buf = p.stdout.read().splitlines(keepends=False)
     if len(buf) < 2:
         raise Exception(buf)
