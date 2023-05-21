@@ -156,9 +156,9 @@ def upload_video(video_file, cover_file, _config, detail):
                 "source": detail['origin'],
                 "tid": _config['tid'],  # 投稿分区
                 "cover": cover_file,  # 视频封面
-                "title": title,
+                "title": "【搬运】：" + title,
                 "desc_format_id": 0,
-                "desc": "搬运：" + detail["origin"],
+                "desc": "由董岩松博客脚本自动搬运：" + detail["origin"],
                 "dolby": 0,  # 杜比音效
                 "dynamic": "",
                 "subtitle": {
