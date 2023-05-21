@@ -142,9 +142,18 @@ def download_cover(url, out):
     with open(out, "wb") as tmp:
         tmp.write(res)
 
+
+def filter_string(text):
+    """
+    过滤字符串中除了中文、英文、数字，日文常用符号以外的字符。
+    """
+    pattern = r'[^\w\s\u4e00-\u9fa5\uff01-\uff5e]+'
+    return re.sub(pattern, '', text)
+
 # 使用biliup工具上传指定视频文件到B站。
 def upload_video(video_file, cover_file, _config, detail):
-    title = detail['title']
+    title_y = detail['title']
+    title = filter_string(title_y)
     if len(title) > 75:
         title = title[:75]
     yml = {
