@@ -207,10 +207,11 @@ def upload_video(video_file, cover_file, _config, detail):
         logging.error(f"输出结果错误:{buf}")
         raise e
     logging.debug(f'上传完成，返回：{data}')
+    ret = json.loads(data)
     pushplus_data = {
         "token": "74dadec01cd345e5bb01204bef88fb97",
         "title": "搬运成功《" + detail['title'] + "》",
-        "content": "稿件《" + detail['title'] + "》" + "\n原视频地址 " + detail["origin"]
+        "content": "稿件《" + detail['title'] + "》" + "\nBV号：" + Bvid:{ret["data"]["bvid"]} + "\n原视频地址 " + detail["origin"]
     }
     res = requests.post("http://www.pushplus.plus/send", data=pushplus_data, proxies=PROXY)
     return json.loads(data)
