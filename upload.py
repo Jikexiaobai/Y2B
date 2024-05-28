@@ -19,6 +19,37 @@ VERIFY = os.environ.get("verify", "1") == "1"
 PROXY = {
     "https": os.environ.get("https_proxy", None)
 }
+# 从视频列表中选取每个频道的前n个未上传视频
+def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
+    """
+    从视频列表中选出未上传的前n个视频，按照频道ID分组。
+
+    参数:
+    video_list: list，包含视频信息的列表，每个元素是(视频ID, 视频详情)的元组。
+    _uploaded: dict，记录已上传视频的字典，键为视频ID，值为上传状态（非None表示已上传）。
+
+    返回值:
+    list，包含每个频道未上传的前n个视频详情的列表。
+    """
+    channel_video_num = 3 # 频道中待上传的视频数量
+    ret = {}
+    # 遍历视频列表，筛选未上传的视频并按频道ID分组
+    for vid, detail in video_list:
+        # 检查视频是否已上传
+        if _uploaded.get(vid) is not None:
+            logging.debug(f'veid:{vid} 已被上传')
+            continue
+        logging.debug(f'veid:{vid} 待上传')
+        # 按频道ID分组，并确保每个频道未上传的视频不超过n个
+        if detail["channel_id"] not in ret:
+            ret[detail["channel_id"]] = []
+        if len(ret[detail["channel_id"]]) < channel_video_num:
+            ret[detail["channel_id"]].append(detail)
+        else:
+            logging.debug(f'频道{detail["channel_id"]}已满{channel_video_num()}个待上传视频')
+    # 返回每个频道未上传的前5个视频详情
+    return ret.values()
+
 
 # 通过Gist ID获取已上传数据（已上传视频信息、配置信息和cookie信息）。
 def get_gist(_gid, token):
@@ -248,19 +279,20 @@ def upload_process(gist_id, token):
     config, cookie, uploaded = get_gist(gist_id, token)
     with open("cookies.json", "w", encoding="utf8") as tmp:
         tmp.write(json.dumps(cookie))
-    need_to_process = get_all_video(config)
-    need = select_not_uploaded(need_to_process, uploaded)
-    for i in need:
-        ret = process_one(i["detail"], i["config"])
-        if ret is None:
-            continue
-        i["ret"] = ret
-        uploaded[i["detail"]["vid"]] = i
-        update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
-        logging.info(
-            f'上传完成,稿件vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},Bvid:{ret["data"]["bvid"]}')
-        logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
-        time.sleep(UPLOAD_SLEEP_SECOND)
+    all_videos = get_all_video(config)
+    need_to_process = select_top_n_not_uploaded(all_videos, uploaded)  # 使用新函数
+    for video_group in need_to_process:
+        for detail in video_group:
+            ret = process_one(detail, config)
+            if ret is None:
+                continue
+            detail["ret"] = ret
+            uploaded[detail["vid"]] = detail
+            update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
+            logging.info(
+                f'上传完成,稿件vid:{detail["vid"]},aid:{ret["data"]["aid"]},Bvid:{ret["data"]["bvid"]}')
+            logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
+            time.sleep(UPLOAD_SLEEP_SECOND)
     os.system("biliup renew 2>&1 > /dev/null")
     with open("cookies.json", encoding="utf8") as tmp:
         data = tmp.read()
