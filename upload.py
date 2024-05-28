@@ -279,7 +279,7 @@ def process_one(detail, config):
     return ret
 
 # 执行整个上传流程。
-def upload_process(gist_id, token):
+def upload_process_n(gist_id, token):
     """
     该函数用于将 YouTube 频道中未上传的视频搬运到B站。
     :param gist_id: str, Gist ID.
@@ -309,6 +309,35 @@ def upload_process(gist_id, token):
         update_gist(gist_id, token, COOKIE_FILE, json.loads(data))
     os.remove("cookies.json")
 
+def upload_process(gist_id, token):
+    """
+    该函数用于将 YouTube 频道中未上传的视频搬运到B站。
+    :param gist_id: str, Gist ID.
+    :param token: str, GitHub Token.
+    :return: None
+    """
+    config, cookie, uploaded = get_gist(gist_id, token)
+    with open("cookies.json", "w", encoding="utf8") as tmp:
+        tmp.write(json.dumps(cookie))
+    need_to_process = get_all_video(config)
+    need = select_not_uploaded(need_to_process, uploaded)
+    for i in need:
+        ret = process_one(i["detail"], i["config"])
+        if ret is None:
+            continue
+        i["ret"] = ret
+        uploaded[i["detail"]["vid"]] = i
+        update_gist(gist_id, token, UPLOADED_VIDEO_FILE, uploaded)
+        logging.info(
+            f'上传完成,稿件vid:{i["detail"]["vid"]},aid:{ret["data"]["aid"]},Bvid:{ret["data"]["bvid"]}')
+        logging.debug(f"防验证码，暂停 {UPLOAD_SLEEP_SECOND} 秒")
+        time.sleep(UPLOAD_SLEEP_SECOND)
+    os.system("biliup renew 2>&1 > /dev/null")
+    with open("cookies.json", encoding="utf8") as tmp:
+        data = tmp.read()
+        update_gist(gist_id, token, COOKIE_FILE, json.loads(data))
+    os.remove("cookies.json")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -323,4 +352,6 @@ if __name__ == "__main__":
         format='%(filename)s:%(lineno)d %(asctime)s.%(msecs)03d %(levelname)s: %(message)s',
         datefmt="%H:%M:%S",
     )
-    upload_process(args.gistId, args.token)
+    # 两个执行方法，选择执行
+    upload_process(args.gistId, args.token) #此方法上传全部灭有上传的视频
+    #upload_process_n(args.gistId, args.token) # 此方法上传每个频道前5个未上传的视频
