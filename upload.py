@@ -129,12 +129,12 @@ def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
         logging.debug(f"Detail content: {detail}")
         #detail_dict = detail if isinstance(detail, dict) else json.loads(detail)
         # 按频道ID分组，并确保每个频道未上传的视频不超过n个
-        if detail_dict["channel_id"] not in ret:
-            ret[detail_dict["channel_id"]] = []
-        if len(ret[detail_dict["channel_id"]]) < channel_video_num:
-            ret[detail_dict["channel_id"]].append(detail)
+        if detail["channel_id"] not in ret:
+            ret[detail["channel_id"]] = []
+        if len(ret[detail["channel_id"]]) < channel_video_num:
+            ret[detail["channel_id"]].append(detail)
         else:
-            logging.debug(f'频道{detail_dict["channel_id"]}已满{channel_video_num}个待上传视频')
+            logging.debug(f'频道{detail["channel_id"]}已满{channel_video_num}个待上传视频')
         # 返回每个频道未上传的前n个视频详情
     return ret.values()
 
