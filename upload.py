@@ -41,6 +41,7 @@ def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
             continue
         logging.debug(f'veid:{vid} 待上传')
         # 将detail转换为字典类型
+        logging.debug(f"Detail content: {detail}")
         detail_dict = detail if isinstance(detail, dict) else json.loads(detail)
         # 按频道ID分组，并确保每个频道未上传的视频不超过n个
         if detail_dict["channel_id"] not in ret:
