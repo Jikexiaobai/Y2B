@@ -19,39 +19,7 @@ VERIFY = os.environ.get("verify", "1") == "1"  # SSL验证
 PROXY = {
     "https": os.environ.get("https_proxy", None)  # HTTPS代理
 }
-# 从视频列表中选取每个频道的前n个未上传视频
-def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
-    """
-    从视频列表中选出未上传的前n个视频，按照频道ID分组。
 
-    参数:
-    video_list: list，包含视频信息的列表，每个元素是(视频ID, 视频详情)的元组。
-    _uploaded: dict，记录已上传视频的字典，键为视频ID，值为上传状态（非None表示已上传）。
-
-    返回值:
-    list，包含每个频道未上传的前n个视频详情的列表。
-    """
-    channel_video_num = 3 # 频道中待上传的视频数量
-    ret = {}
-    # 遍历视频列表，筛选未上传的视频并按频道ID分组
-    for vid, detail in video_list:
-        # 检查视频是否已上传
-        if _uploaded.get(vid) is not None:
-            logging.debug(f'veid:{vid} 已被上传')
-            continue
-        logging.debug(f'veid:{vid} 待上传')
-        # 将detail转换为字典类型
-        logging.debug(f"Detail content: {detail}")
-        detail_dict = detail if isinstance(detail, dict) else json.loads(detail)
-        # 按频道ID分组，并确保每个频道未上传的视频不超过n个
-        if detail_dict["channel_id"] not in ret:
-            ret[detail_dict["channel_id"]] = []
-        if len(ret[detail_dict["channel_id"]]) < channel_video_num:
-            ret[detail_dict["channel_id"]].append(detail)
-        else:
-            logging.debug(f'频道{detail_dict["channel_id"]}已满{channel_video_num}个待上传视频')
-        # 返回每个频道未上传的前n个视频详情
-    return ret.values()
 
 
 # 通过Gist ID获取已上传数据（已上传视频信息、配置信息和cookie信息）。
@@ -135,6 +103,41 @@ def select_not_uploaded(video_list: list, _uploaded: dict):
         logging.debug(f'vid:{i["detail"]["vid"]} 待上传')
         ret.append(i)
     return ret
+
+# 从视频列表中选取每个频道的前n个未上传视频
+def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
+    """
+    从视频列表中选出未上传的前n个视频，按照频道ID分组。
+
+    参数:
+    video_list: list，包含视频信息的列表，每个元素是(视频ID, 视频详情)的元组。
+    _uploaded: dict，记录已上传视频的字典，键为视频ID，值为上传状态（非None表示已上传）。
+
+    返回值:
+    list，包含每个频道未上传的前n个视频详情的列表。
+    """
+    channel_video_num = 3 # 频道中待上传的视频数量
+    ret = {}
+    # 遍历视频列表，筛选未上传的视频并按频道ID分组
+    for vid, detail in video_list:
+        # 检查视频是否已上传
+        if _uploaded.get(vid) is not None:
+            logging.debug(f'veid:{vid} 已被上传')
+            continue
+        logging.debug(f'veid:{vid} 待上传')
+        # 将detail转换为字典类型
+        logging.debug(f"Detail content: {detail}")
+        #detail_dict = detail if isinstance(detail, dict) else json.loads(detail)
+        # 按频道ID分组，并确保每个频道未上传的视频不超过n个
+        if detail_dict["channel_id"] not in ret:
+            ret[detail_dict["channel_id"]] = []
+        if len(ret[detail_dict["channel_id"]]) < channel_video_num:
+            ret[detail_dict["channel_id"]].append(detail)
+        else:
+            logging.debug(f'频道{detail_dict["channel_id"]}已满{channel_video_num}个待上传视频')
+        # 返回每个频道未上传的前n个视频详情
+    return ret.values()
+
 
 # 获取所有需要上传的视频信息。
 def get_all_video(_config):
