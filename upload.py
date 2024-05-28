@@ -10,14 +10,14 @@ import argparse
 import logging
 import sys
 
-
-UPLOAD_SLEEP_SECOND = 60 * 2  # 2min
-UPLOADED_VIDEO_FILE = "uploaded_video.json"
-CONFIG_FILE = "config.json"
-COOKIE_FILE = "cookie.json"
-VERIFY = os.environ.get("verify", "1") == "1"
+# 定义常量
+UPLOAD_SLEEP_SECOND = 60 * 2  # 上传间隔时间，2分钟
+UPLOADED_VIDEO_FILE = "uploaded_video.json"  # 已上传视频信息文件名
+CONFIG_FILE = "config.json"  # 配置文件名
+COOKIE_FILE = "cookie.json"  # Cookie文件名
+VERIFY = os.environ.get("verify", "1") == "1"  # SSL验证
 PROXY = {
-    "https": os.environ.get("https_proxy", None)
+    "https": os.environ.get("https_proxy", None)  # HTTPS代理
 }
 # 从视频列表中选取每个频道的前n个未上传视频
 def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
@@ -40,14 +40,16 @@ def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
             logging.debug(f'veid:{vid} 已被上传')
             continue
         logging.debug(f'veid:{vid} 待上传')
+        # 将detail转换为字典类型
+        detail_dict = detail if isinstance(detail, dict) else json.loads(detail)
         # 按频道ID分组，并确保每个频道未上传的视频不超过n个
-        if detail["channel_id"] not in ret:
-            ret[detail["channel_id"]] = []
-        if len(ret[detail["channel_id"]]) < channel_video_num:
-            ret[detail["channel_id"]].append(detail)
+        if detail_dict["channel_id"] not in ret:
+            ret[detail_dict["channel_id"]] = []
+        if len(ret[detail_dict["channel_id"]]) < channel_video_num:
+            ret[detail_dict["channel_id"]].append(detail)
         else:
-            logging.debug(f'频道{detail["channel_id"]}已满{channel_video_num()}个待上传视频')
-    # 返回每个频道未上传的前5个视频详情
+            logging.debug(f'频道{detail_dict["channel_id"]}已满{channel_video_num}个待上传视频')
+        # 返回每个频道未上传的前n个视频详情
     return ret.values()
 
 
