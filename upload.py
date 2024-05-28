@@ -120,6 +120,10 @@ def select_top_n_not_uploaded(video_list: list, _uploaded: dict):
     ret = {}
     # 遍历视频列表，筛选未上传的视频并按频道ID分组
     for vid, detail in video_list:
+        # 确保detail是一个字典，如果不是，则跳过
+        if not isinstance(detail, dict):
+            logging.error(f"Expected a dict but got {type(detail)} for detail: {detail}")
+            continue
         # 检查视频是否已上传
         if _uploaded.get(vid) is not None:
             logging.debug(f'veid:{vid} 已被上传')
